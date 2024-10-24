@@ -50,10 +50,6 @@ This includes:
 - Model response with detailed explanation (293 tokens)
 - Total = 300 tokens per turn
 
-**Note**:
-- Backend RAG-related token generation isn't included e.g. generating embeddings, question parsing, generating queries, CoT, etc. 
-- TODO include approx 6-8k tokens for each turn. 
-
 """
 )
 
