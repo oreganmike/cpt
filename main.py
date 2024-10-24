@@ -73,9 +73,9 @@ def main():
     # Model Selection
     model_type = st.sidebar.selectbox(
         "Select OpenAI Model",
-        options=["gpt-4o"],
+        options=["gpt-4o","gpt-4o-alt"],
         index=0,
-        help="Choose the OpenAI model you plan to use. Different models have different costs per token.",
+        help="Sets the cost per token.",
     )
     default_cost_per_token = get_default_cost_per_token(model_type)
 
@@ -95,7 +95,7 @@ def main():
         max_value=0.01,
         value=default_cost_per_token,
         format="%.8f",
-        help="Enter the cost per token in GBP. You can override the default cost based on the selected model.",
+        help="Enter the cost per token in GBP.",
     )
 
     # Council Population Input
@@ -135,7 +135,7 @@ def main():
                 max_value=100.0,
                 value=3.0,
                 step=0.1,
-                help="Percentage of visitors who engage with the chatbot.",
+                help="Percentage of active users who engage with the chatbot.",
             )
             / 100
         )
@@ -144,14 +144,14 @@ def main():
             min_value=0.0,
             value=1.2,
             step=0.1,
-            help="Conversations a user has per visit. Where a conversation =  .",
+            help="Conversations a user has per visit.",
         )
         avg_conversation_length = st.sidebar.number_input(
             "Average Conversation Length (Turns)",
             min_value=1,
             value=4,
             step=1,
-            help="Average number of turns (user request and model response) per conversation.",
+            help="The number of turns per conversation (turn = 1 x user request and 1 x model response).",
         )
         # Custom Cost per Token Input
         tokens_per_turn = st.sidebar.number_input(
@@ -159,7 +159,7 @@ def main():
             min_value=200,
             max_value=10000,
             value=300,
-            help="User request tokens + model response tokens",
+            help="User request tokens + model response tokens.",
         )
         custom_params = {
             "engagement_rate": engagement_rate,
@@ -228,7 +228,7 @@ def main():
             {
                 "Metric": "Conversion Rate",
                 "Value": f"{conversion_rate * 100:.2f}%",
-                "Notes": "Percentage of population using digital services",
+                "Notes": "Percentage of population who visit the website",
             },
             {
                 "Metric": "Monthly Unique Visitors",
