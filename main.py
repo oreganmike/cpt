@@ -202,6 +202,8 @@ def main():
     # )
     # st.bar_chart(cost_data.set_index("Scenario"))
 
+    # [Previous code remains the same until the Detailed Calculations section]
+
     # Detailed Calculations for Selected Scenario
     if scenario != "Custom":
         selected_params = SCENARIOS[scenario]
@@ -211,20 +213,101 @@ def main():
     detailed_estimated = calculate_costs(
         selected_params, custom_cost_per_token, monthly_unique_visitors, tokens_per_turn
     )
-    st.subheader(f"Detailed Calculation for {scenario} Scenario")
-    st.write(f"**Council Population:** {int(council_population):,}")
-    st.write(f"**Conversion Rate:** {conversion_rate * 100:.2f}%")
-    st.write(f"**Estimated Monthly Unique Visitors:** {int(monthly_unique_visitors):,}")
-    st.write(f"**Engaged Users:** {int(detailed_estimated['Engaged Users']):,}")
-    st.write(
-        f"**Total Conversations:** {int(detailed_estimated['Total Conversations']):,}"
+
+    st.subheader(f"Calculation for {scenario} Scenario")
+
+    # Create a DataFrame for the detailed calculations
+    detailed_df = pd.DataFrame(
+        [
+            {
+                "Metric": "Council Population",
+                "Value": f"{int(council_population):,}",
+                "Notes": "Total population in council area",
+            },
+            {
+                "Metric": "Conversion Rate",
+                "Value": f"{conversion_rate * 100:.2f}%",
+                "Notes": "Percentage of population using digital services",
+            },
+            {
+                "Metric": "Monthly Unique Visitors",
+                "Value": f"{int(monthly_unique_visitors):,}",
+                "Notes": "Population × Conversion Rate",
+            },
+            {
+                "Metric": "Engagement Rate",
+                "Value": f"{selected_params['engagement_rate'] * 100:.2f}%",
+                "Notes": "Percentage of visitors using chatbot",
+            },
+            {
+                "Metric": "Engaged Users",
+                "Value": f"{int(detailed_estimated['Engaged Users']):,}",
+                "Notes": "Monthly Visitors × Engagement Rate",
+            },
+            {
+                "Metric": "Conversations per User",
+                "Value": f"{selected_params['conversations_per_user']:.1f}",
+                "Notes": "Average conversations per engaged user",
+            },
+            {
+                "Metric": "Total Conversations",
+                "Value": f"{int(detailed_estimated['Total Conversations']):,}",
+                "Notes": "Engaged Users × Conversations per User",
+            },
+            {
+                "Metric": "Conversation Length",
+                "Value": f"{selected_params['avg_conversation_length']} turns",
+                "Notes": "Number of back-and-forth exchanges",
+            },
+            {
+                "Metric": "Tokens per Turn",
+                "Value": f"{tokens_per_turn:,}",
+                "Notes": "Total tokens in one exchange (input + response)",
+            },
+            {
+                "Metric": "Tokens per Conversation",
+                "Value": f"{int(detailed_estimated['Tokens per Conversation']):,}",
+                "Notes": "Conversation Length × Tokens per Turn",
+            },
+            {
+                "Metric": "Total Monthly Tokens",
+                "Value": f"{int(detailed_estimated['Total Tokens']):,}",
+                "Notes": "Total Conversations × Tokens per Conversation",
+            },
+            {
+                "Metric": "Cost per Token",
+                "Value": f"£{custom_cost_per_token:.8f}",
+                "Notes": "Price per token processed",
+            },
+            {
+                "Metric": "Estimated Monthly Cost",
+                "Value": f"£{detailed_estimated['Estimated Cost (GBP)']:.2f}",
+                "Notes": "Total Tokens × Cost per Token",
+            },
+        ]
     )
-    st.write(
-        f"**Tokens per Conversation:** {int(detailed_estimated['Tokens per Conversation']):,}"
+
+
+    # Display the table with custom formatting and auto-height
+    st.dataframe(
+        detailed_df,
+        column_config={
+            "Metric": "Metric",
+            "Value": st.column_config.Column(
+                "Value",
+                width="medium",
+            ),
+            "Notes": st.column_config.Column(
+                "Notes",
+                width="large",
+            ),
+        },
+        hide_index=True,
+        height=((len(detailed_df) + 1) * 35)
+        + 3,  # Calculate height based on number of rows plus header
+        use_container_width=True,  # Use full width of the container
     )
-    st.write(f"**Total Tokens:** {int(detailed_estimated['Total Tokens']):,}")
-    st.write(f"**Cost per Token:** £{custom_cost_per_token:.8f}")
-    st.write(f"**Estimated Cost:** £{detailed_estimated['Estimated Cost (GBP)']:.2f}")
+
 
     # Option to download the table as CSV
     csv = df.to_csv(index=False).encode("utf-8")
