@@ -25,8 +25,8 @@ st.subheader("OpenAI Model Selection")
 st.markdown(
     """
 Model selection isn't that significant. For now it just allows for cost per token values to be pre-set. 
-- **GPT-4o**: Sets a cost per completion token of 0.000009329801 (GBP)
-- **GPT-4o-alt**: Sets a cost per completion token of 0.00000362 (GBP)
+- **GPT-4o**: Sets a cost per completion token of 0.00000362 (GBP)
+- **GPT-4o-alt**: Sets a cost per completion token of 0.0000093298 (GBP)
 
 """
 )

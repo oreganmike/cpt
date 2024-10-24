@@ -8,7 +8,7 @@ st.markdown(
 )
 
 # === Token Metrics ===
-MODEL_COSTS = {"gpt-4o": 0.000009329801, "gpt-4o-alt": 0.0000036184}
+MODEL_COSTS = {"gpt-4o": 0.00000362, "gpt-4o-alt": 0.000009329801}
 
 # === Scenarios ===
 SCENARIOS = {
@@ -19,17 +19,17 @@ SCENARIOS = {
     },
     "Medium": {
         "engagement_rate": 0.03,
-        "conversations_per_user": 2.2,
+        "conversations_per_user": 1.8,
         "avg_conversation_length": 4,
     },
     "Heavy": {
-        "engagement_rate": 0.06,
-        "conversations_per_user": 4.6,
+        "engagement_rate": 0.05,
+        "conversations_per_user": 2.6,
         "avg_conversation_length": 8,
     },
     "Custom": {
         "engagement_rate": 0.05,  # Default values; will be overridden
-        "conversations_per_user": 2.5,
+        "conversations_per_user": 2.1,
         "avg_conversation_length": 5,
     },
 }
@@ -37,7 +37,7 @@ SCENARIOS = {
 
 def get_default_cost_per_token(model_type):
     return MODEL_COSTS.get(
-        model_type, 0.000009329801
+        model_type, 0.00000362
     )  # Default to gpt-4 if not specified
 
 
