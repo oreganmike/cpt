@@ -52,7 +52,7 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
         "Total Conversations": total_conversations,
         "Tokens per Conversation": tokens_per_conversation,
         "Total Tokens": total_tokens,
-        "Estimated Cost (GBP)": estimated_cost,
+        "Est Cost (GBP)": estimated_cost,
     }
 
 
@@ -185,7 +185,7 @@ def main():
                 "Conversations per User": params["conversations_per_user"],
                 "Avg Conversation Length (Turns)": params["avg_conversation_length"],
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.8f}",
-                "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:.2f}",
+                "Est Cost (GBP)": f"£{estimated['Est Cost (GBP)']:.2f}",
             }
         )
 
@@ -236,7 +236,7 @@ def main():
             },
             {
                 "Metric": "Conversations per User",
-                "Value": f"{selected_params['conversations_per_user']:.1f}",
+                "Value": f"{selected_params['conversations_per_user']}",
                 "Notes": "Average conversations per engaged user",
             },
             {
@@ -276,7 +276,7 @@ def main():
             },
             {
                 "Metric": "Estimated Monthly Cost",
-                "Value": f"£{detailed_estimated['Estimated Cost (GBP)']:.2f}",
+                "Value": f"£{detailed_estimated['Est Cost (GBP)']:.2f}",
                 "Notes": "Total Tokens × Cost per Token",
             },
         ]
