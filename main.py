@@ -10,6 +10,7 @@ st.markdown(
 # === Token Metrics ===
 MODEL_COSTS = {
     "gpt-4o": 0.0000036184,
+    "gpt-4o-alt": 0.000009329801
 }
 
 # === Scenarios ===
