@@ -46,14 +46,24 @@ This includes:
 - Long, detailed exchanges: 800+ tokens
 
 **Example**:
-- User question: "What are the council tax bands?" (6 tokens)
-- Model response with detailed explanation (294 tokens)
+- User question: "What are the council tax bands?" (7 tokens)
+- Model response with detailed explanation (293 tokens)
 - Total = 300 tokens per turn
 
 **Note**:
 - Backend RAG-related token generation isn't included e.g. generating embeddings, question parsing, generating queries, CoT, etc. 
 - TODO include approx 6-8k tokens for each turn. 
 
+"""
+)
+
+st.subheader("RAG Tokens")
+st.markdown(
+    """
+**Definition**: The number of tokens consumed during the RAG process. 
+
+- Essentially all RAG tokens consist of text chunks that are submitted to the model for a contexually aided response
+- Embedding tokens are generated for the user's question. 
 """
 )
 
@@ -112,9 +122,9 @@ st.markdown(
 **Definition**: Percentage of website visitors who interact with the chatbot.
 
 Different scenarios provide different assumptions:
-- **Conservative**: 2% (1 in 50 visitors use the chatbot)
-- **Moderate**: 3% (1 in 33 visitors use the chatbot)
-- **Optimistic**: 6% (1 in 17 visitors use the chatbot)
+- **Low**: 2% (1 in 50 visitors use the chatbot)
+- **Medium**: 3% (1 in 33 visitors use the chatbot)
+- **Heavy**: 6% (1 in 17 visitors use the chatbot)
 
 Based on typical chatbot adoption rates in public sector websites.
 """
@@ -126,9 +136,9 @@ st.markdown(
 **Definition**: Average number of separate conversations each engaged user has per month.
 
 Scenario assumptions:
-- **Conservative**: 1.0 (one conversation per user)
-- **Moderate**: 1.2 (some users have multiple conversations)
-- **Optimistic**: 2.2 (users regularly return for multiple queries)
+- **Low**: 1.0 (one conversation per user)
+- **Medium**: 1.2 (some users have multiple conversations)
+- **Heavy**: 2.2 (users regularly return for multiple queries)
 
 A conversation is a complete interaction session, which includes multiple turns.
 """
@@ -144,9 +154,9 @@ One turn consists of:
 2. Chatbot response
 
 Scenario assumptions:
-- **Conservative**: 3 turns (brief, focused interactions)
-- **Moderate**: 4 turns (standard query resolution)
-- **Optimistic**: 8 turns (detailed, multi-step interactions)
+- **Low**: 3 turns (brief, focused interactions)
+- **Medium**: 4 turns (standard query resolution)
+- **Heavy**: 8 turns (detailed, multi-step interactions)
 
 **Example of a 3-turn conversation**:
 1. User asks about council tax → Bot responds

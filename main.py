@@ -12,17 +12,17 @@ MODEL_COSTS = {"gpt-4o": 0.0000036184, "gpt-4o-alt": 0.000009329801}
 
 # === Scenarios ===
 SCENARIOS = {
-    "Conservative": {
+    "Low": {
         "engagement_rate": 0.02,
         "conversations_per_user": 1.0,
         "avg_conversation_length": 3,
     },
-    "Moderate": {
+    "Medium": {
         "engagement_rate": 0.03,
         "conversations_per_user": 1.2,
         "avg_conversation_length": 4,
     },
-    "Optimistic": {
+    "Heavy": {
         "engagement_rate": 0.06,
         "conversations_per_user": 2.2,
         "avg_conversation_length": 8,
