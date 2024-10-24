@@ -24,8 +24,9 @@ st.header("1. Model Parameters")
 st.subheader("OpenAI Model Selection")
 st.markdown(
     """
-Currently supports:
-- **GPT-4o**: The latest and most capable model from OpenAI
+Model selection isn't that significant. For now it just allows for cost per token values to be pre-set. 
+- **GPT-4o**: Sets a cost per completion token of 0.00000362 (GBP)
+- **GPT-4o-alt**: Sets a cost per completion token of 0.0000093298 (GBP)
 
 """
 )
@@ -48,6 +49,11 @@ This includes:
 - User question: "What are the council tax bands?" (6 tokens)
 - Model response with detailed explanation (294 tokens)
 - Total = 300 tokens per turn
+
+**Note**:
+- Backend RAG-related token generation isn't included e.g. generating embeddings, question parsing, generating queries, CoT, etc. 
+- TODO include approx 6-8k tokens for each turn. 
+
 """
 )
 
@@ -57,7 +63,7 @@ st.markdown(
 **Definition**: The price charged by Azure OpenAI for processing one token.
 
 - Measured in GBP
-- Varies by model type
+- Pre-set cost per token assumes pay-as-you-go pricing
 """
 )
 
@@ -71,7 +77,7 @@ st.markdown(
     """
 **Definition**: The total number of residents in the council area.
 
-This serves as the base for calculating potential citizen numbers:
+This serves as the base for calculating potential citizen engagement:
 - Used to estimate total reach
 - Starting point for conversion calculations
 - Should be based on latest census or council data
