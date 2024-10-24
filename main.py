@@ -1,10 +1,15 @@
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(page_title="Azure OpenAI Cost Estimator", layout="wide")
+st.markdown(
+    """<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} </style>""",
+    unsafe_allow_html=True,
+)
+
 # === Token Metrics ===
 MODEL_COSTS = {
-    "gpt-3": 0.000002,  # Example cost per token in GBP
-    "gpt-4": 0.0000036184,
+    "gpt-4o": 0.0000036184,
 }
 
 # === Scenarios ===
@@ -20,9 +25,9 @@ SCENARIOS = {
         "avg_conversation_length": 4,
     },
     "Optimistic": {
-        "engagement_rate": 0.05,
-        "conversations_per_user": 1.5,
-        "avg_conversation_length": 5,
+        "engagement_rate": 0.06,
+        "conversations_per_user": 2.2,
+        "avg_conversation_length": 8,
     },
     "Custom": {
         "engagement_rate": 0.03,  # Default values; will be overridden
@@ -38,12 +43,10 @@ def get_default_cost_per_token(model_type):
     )  # Default to gpt-4 if not specified
 
 
-def calculate_costs(params, cost_per_token, total_visitors):
+def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
     engaged_users = total_visitors * params["engagement_rate"]
     total_conversations = engaged_users * params["conversations_per_user"]
-    tokens_per_conversation = (
-        params["avg_conversation_length"] * 270
-    )  # avg_tokens_per_turn
+    tokens_per_conversation = params["avg_conversation_length"] * tokens_per_turn
     total_tokens = total_conversations * tokens_per_conversation
     estimated_cost = total_tokens * cost_per_token
     return {
@@ -69,11 +72,20 @@ def main():
     # Model Selection
     model_type = st.sidebar.selectbox(
         "Select OpenAI Model",
-        options=["gpt-3", "gpt-4"],
-        index=1,
+        options=["gpt-4o"],
+        index=0,
         help="Choose the OpenAI model you plan to use. Different models have different costs per token.",
     )
     default_cost_per_token = get_default_cost_per_token(model_type)
+
+    # # Custom Cost per Token Input
+    # tokens_per_turn = st.sidebar.number_input(
+    #     "Tokens per Turn",
+    #     min_value=200,
+    #     max_value=10000,
+    #     value=300,
+    #     help="User request tokens + model response tokens",
+    # )
 
     # Custom Cost per Token Input
     custom_cost_per_token = st.sidebar.number_input(
@@ -84,8 +96,6 @@ def main():
         format="%.8f",
         help="Enter the cost per token in GBP. You can override the default cost based on the selected model.",
     )
-
-    # st.sidebar.markdown("---")  # Separator
 
     # Council Population Input
     st.sidebar.subheader("Council Metrics")
@@ -113,18 +123,9 @@ def main():
     # Calculate Monthly Unique Visitors
     monthly_unique_visitors = council_population * conversion_rate
 
-    # # Scenario Selection
-    # scenario = st.sidebar.selectbox(
-    #     "Select Scenario",
-    #     options=list(SCENARIOS.keys()),
-    #     help="Choose a predefined scenario or customize your own parameters.",
-    #     index=3,
-    # )
-
     scenario = "Custom"
 
     st.sidebar.subheader("Chatbot Metrics")
-    # If Custom Scenario, show additional inputs
     if scenario == "Custom":
         engagement_rate = (
             st.sidebar.number_input(
@@ -142,7 +143,7 @@ def main():
             min_value=0.0,
             value=1.2,
             step=0.1,
-            help="Average number of conversations per engaged user.",
+            help="Conversations a user has per visit. Where a conversation =  .",
         )
         avg_conversation_length = st.sidebar.number_input(
             "Average Conversation Length (Turns)",
@@ -150,6 +151,14 @@ def main():
             value=4,
             step=1,
             help="Average number of turns (user request and model response) per conversation.",
+        )
+        # Custom Cost per Token Input
+        tokens_per_turn = st.sidebar.number_input(
+            "Tokens per Turn",
+            min_value=200,
+            max_value=10000,
+            value=300,
+            help="User request tokens + model response tokens",
         )
         custom_params = {
             "engagement_rate": engagement_rate,
@@ -166,7 +175,7 @@ def main():
         if sc == "Custom" and scenario == "Custom":
             params = custom_params
         estimated = calculate_costs(
-            params, custom_cost_per_token, monthly_unique_visitors
+            params, custom_cost_per_token, monthly_unique_visitors, tokens_per_turn
         )
         data.append(
             {
@@ -200,7 +209,7 @@ def main():
         selected_params = custom_params
 
     detailed_estimated = calculate_costs(
-        selected_params, custom_cost_per_token, monthly_unique_visitors
+        selected_params, custom_cost_per_token, monthly_unique_visitors, tokens_per_turn
     )
     st.subheader(f"Detailed Calculation for {scenario} Scenario")
     st.write(f"**Council Population:** {int(council_population):,}")
