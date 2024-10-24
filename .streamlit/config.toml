@@ -5,6 +5,9 @@ primaryColor="#23abf2"
 secondaryBackgroundColor="#0f171d"
 textColor="#e4e4e4"
 
+[ui]
+hideTopBar = true
+
 [global]
 disableWidgetStateDuplicationWarning = true
 
