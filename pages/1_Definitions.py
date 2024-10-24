@@ -60,6 +60,13 @@ st.markdown(
 
 - Essentially all RAG tokens consist of text chunks that are submitted to the model for a contexually aided response
 - Embedding tokens are generated for the user's question. 
+
+**Example**:
+- User question: "What are the council tax bands?" (7 tokens)
+- RAG process: Generates embeddings, performs search, submits question to model with chunks (~8,000 tokens)
+- Model response with detailed explanation (293 tokens)
+- Total = 8,300 tokens per turn
+
 """
 )
 
