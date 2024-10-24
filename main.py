@@ -193,14 +193,14 @@ def main():
     st.subheader("Estimated Monthly Costs")
     st.table(df)
 
-    # Bar Chart Visualization
-    st.subheader("Cost Comparison Across Scenarios")
-    cost_data = df[["Scenario", "Estimated Cost (GBP)"]].copy()
-    # Convert 'Estimated Cost (GBP)' to numeric by stripping the currency symbol
-    cost_data["Estimated Cost (GBP)"] = (
-        cost_data["Estimated Cost (GBP)"].replace("[£,]", "", regex=True).astype(float)
-    )
-    st.bar_chart(cost_data.set_index("Scenario"))
+    # # Bar Chart Visualization
+    # st.subheader("Cost Comparison Across Scenarios")
+    # cost_data = df[["Scenario", "Estimated Cost (GBP)"]].copy()
+    # # Convert 'Estimated Cost (GBP)' to numeric by stripping the currency symbol
+    # cost_data["Estimated Cost (GBP)"] = (
+    #     cost_data["Estimated Cost (GBP)"].replace("[£,]", "", regex=True).astype(float)
+    # )
+    # st.bar_chart(cost_data.set_index("Scenario"))
 
     # Detailed Calculations for Selected Scenario
     if scenario != "Custom":
