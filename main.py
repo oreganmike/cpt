@@ -90,12 +90,12 @@ def main():
 
     # Custom Cost per Token Input
     custom_cost_per_token = st.sidebar.number_input(
-        "Cost per Token (GBP)",
+        "Cost per chat Token (GBP)",
         min_value=0.000001,
         max_value=0.01,
         value=default_cost_per_token,
         format="%.8f",
-        help="Enter the cost per token in GBP.",
+        help="The cost per chat completion token in GBP.",
     )
 
     # Council Population Input
