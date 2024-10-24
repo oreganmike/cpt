@@ -25,8 +25,8 @@ st.subheader("OpenAI Model Selection")
 st.markdown(
     """
 Model selection isn't that significant. For now it just allows for cost per token values to be pre-set. 
-- **GPT-4o**: Sets a cost per completion token of 0.00000362 (GBP)
-- **GPT-4o-alt**: Sets a cost per completion token of 0.0000093298 (GBP)
+- **GPT-4o**: Sets a cost per completion token of 0.000009329801 (GBP)
+- **GPT-4o-alt**: Sets a cost per completion token of 0.00000362 (GBP)
 
 """
 )
@@ -90,7 +90,7 @@ st.markdown(
 This serves as the base for calculating potential citizen engagement:
 - Used to estimate total reach
 - Starting point for conversion calculations
-- Should be based on latest census or council data
+
 """
 )
 
@@ -106,7 +106,9 @@ st.markdown(
 - Monthly Active Users: 126,253
 - Conversion Rate: 57.4%
 
-This metric helps estimate how many citizens could engage in conversations. It's also a metric council's can easily provide.
+This metric helps estimate how many citizens could engage in conversations. 
+It's also a metric councils can easily provide from their Google Analytics data.
+
 """
 )
 
@@ -126,7 +128,7 @@ Different scenarios provide different assumptions:
 - **Medium**: 3% (1 in 33 visitors use the chatbot)
 - **Heavy**: 6% (1 in 17 visitors use the chatbot)
 
-Based on typical chatbot adoption rates in public sector websites.
+Based on very loose numbers from data.gov.uk
 """
 )
 
@@ -137,8 +139,8 @@ st.markdown(
 
 Scenario assumptions:
 - **Low**: 1.0 (one conversation per user)
-- **Medium**: 1.2 (some users have multiple conversations)
-- **Heavy**: 2.2 (users regularly return for multiple queries)
+- **Medium**: 2.2 (some users have multiple conversations)
+- **Heavy**: 4.6 (users regularly return for multiple queries)
 
 A conversation is a complete interaction session, which includes multiple turns.
 """
