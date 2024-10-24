@@ -1,0 +1,17 @@
+[theme]
+backgroundColor = "#000000"
+base="dark"
+primaryColor="#23abf2"
+secondaryBackgroundColor="#0f171d"
+textColor="#e4e4e4"
+
+[global]
+disableWidgetStateDuplicationWarning = true
+
+[server]
+maxUploadSize = 100
+enableXsrfProtection = false
+enableCORS = false
+
+[client]
+showErrorDetails = false
