@@ -194,122 +194,118 @@ def main():
     st.subheader("Estimated Monthly Costs")
     st.table(df)
 
-    # Detailed Calculations for Selected Scenario
-    if scenario != "Custom":
-        selected_params = SCENARIOS[scenario]
-    else:
-        selected_params = custom_params
+    with st.expander("Show Custom Scenario Details"):
 
-    detailed_estimated = calculate_costs(
-        selected_params, custom_cost_per_token, monthly_unique_visitors, tokens_per_turn
-    )
+        # Detailed Calculations for Selected Scenario
+        if scenario != "Custom":
+            selected_params = SCENARIOS[scenario]
+        else:
+            selected_params = custom_params
 
-    st.subheader(f"Calculation for {scenario} Scenario")
+        detailed_estimated = calculate_costs(
+            selected_params,
+            custom_cost_per_token,
+            monthly_unique_visitors,
+            tokens_per_turn,
+        )
 
-    # Create a DataFrame for the detailed calculations
-    detailed_df = pd.DataFrame(
-        [
-            {
-                "Metric": "Council Population",
-                "Value": f"{int(council_population):,}",
-                "Notes": "Total population in council area",
-            },
-            {
-                "Metric": "Conversion Rate",
-                "Value": f"{conversion_rate * 100:.2f}%",
-                "Notes": "Percentage of population who visit the website",
-            },
-            {
-                "Metric": "Monthly Unique Visitors",
-                "Value": f"{int(monthly_unique_visitors):,}",
-                "Notes": "Population × Conversion Rate",
-            },
-            {
-                "Metric": "Engagement Rate",
-                "Value": f"{selected_params['engagement_rate'] * 100:.2f}%",
-                "Notes": "Percentage of visitors using chatbot",
-            },
-            {
-                "Metric": "Engaged Users",
-                "Value": f"{int(detailed_estimated['Engaged Users']):,}",
-                "Notes": "Monthly Visitors × Engagement Rate",
-            },
-            {
-                "Metric": "Conversations per User",
-                "Value": f"{selected_params['conversations_per_user']}",
-                "Notes": "Average conversations per engaged user",
-            },
-            {
-                "Metric": "Total Conversations",
-                "Value": f"{int(detailed_estimated['Total Conversations']):,}",
-                "Notes": "Engaged Users × Conversations per User",
-            },
-            {
-                "Metric": "Conversation Length",
-                "Value": f"{selected_params['avg_conversation_length']} turns",
-                "Notes": "Number of back-and-forth exchanges",
-            },
-            {
-                "Metric": "Tokens per Turn",
-                "Value": f"{chat_tokens_per_turn:,}",
-                "Notes": "Total tokens in one exchange (input + response)",
-            },
-            {
-                "Metric": "RAG Tokens",
-                "Value": f"{rag_tokens:,}",
-                "Notes": "RAG tokens consumed in each Turn",
-            },
-            {
-                "Metric": "Tokens per Conversation",
-                "Value": f"{int(detailed_estimated['Tokens per Conversation']):,}",
-                "Notes": "Conversation Length × Tokens per Turn",
-            },
-            {
-                "Metric": "Total Monthly Tokens",
-                "Value": f"{int(detailed_estimated['Total Tokens']):,}",
-                "Notes": "Total Conversations × Tokens per Conversation",
-            },
-            {
-                "Metric": "Cost per Token",
-                "Value": f"£{custom_cost_per_token:.8f}",
-                "Notes": "Price per token processed",
-            },
-            {
-                "Metric": "Estimated Monthly Cost",
-                "Value": f"£{detailed_estimated['Est Cost (GBP)']:.2f}",
-                "Notes": "Total Tokens × Cost per Token",
-            },
-        ]
-    )
+        st.subheader(f"Calculation for {scenario} Scenario")
 
-    # Display the table with custom formatting and auto-height
-    st.dataframe(
-        detailed_df,
-        column_config={
-            "Metric": "Metric",
-            "Value": st.column_config.Column(
-                "Value",
-                width="medium",
-            ),
-            "Notes": st.column_config.Column(
-                "Notes",
-                width="large",
-            ),
-        },
-        hide_index=True,
-        height=((len(detailed_df) + 1) * 35)
-        + 3,  # Calculate height based on number of rows plus header
-        use_container_width=True,  # Use full width of the container
-    )
+        # Create a DataFrame for the detailed calculations
+        detailed_df = pd.DataFrame(
+            [
+                {
+                    "Metric": "Council Population",
+                    "Value": f"{int(council_population):,}",
+                    "Notes": "Total population in council area",
+                },
+                {
+                    "Metric": "Conversion Rate",
+                    "Value": f"{conversion_rate * 100:.2f}%",
+                    "Notes": "Percentage of population who visit the website",
+                },
+                {
+                    "Metric": "Monthly Unique Visitors",
+                    "Value": f"{int(monthly_unique_visitors):,}",
+                    "Notes": "Population × Conversion Rate",
+                },
+                {
+                    "Metric": "Engagement Rate",
+                    "Value": f"{selected_params['engagement_rate'] * 100:.2f}%",
+                    "Notes": "Percentage of visitors using chatbot",
+                },
+                {
+                    "Metric": "Engaged Users",
+                    "Value": f"{int(detailed_estimated['Engaged Users']):,}",
+                    "Notes": "Monthly Visitors × Engagement Rate",
+                },
+                {
+                    "Metric": "Conversations per User",
+                    "Value": f"{selected_params['conversations_per_user']}",
+                    "Notes": "Average conversations per engaged user",
+                },
+                {
+                    "Metric": "Total Conversations",
+                    "Value": f"{int(detailed_estimated['Total Conversations']):,}",
+                    "Notes": "Engaged Users × Conversations per User",
+                },
+                {
+                    "Metric": "Conversation Length",
+                    "Value": f"{selected_params['avg_conversation_length']} turns",
+                    "Notes": "Number of back-and-forth exchanges",
+                },
+                {
+                    "Metric": "Tokens per Turn",
+                    "Value": f"{chat_tokens_per_turn:,}",
+                    "Notes": "Total tokens in one exchange (input + response)",
+                },
+                {
+                    "Metric": "RAG Tokens",
+                    "Value": f"{rag_tokens:,}",
+                    "Notes": "RAG tokens consumed in each Turn",
+                },
+                {
+                    "Metric": "Tokens per Conversation",
+                    "Value": f"{int(detailed_estimated['Tokens per Conversation']):,}",
+                    "Notes": "Conversation Length × Tokens per Turn",
+                },
+                {
+                    "Metric": "Total Monthly Tokens",
+                    "Value": f"{int(detailed_estimated['Total Tokens']):,}",
+                    "Notes": "Total Conversations × Tokens per Conversation",
+                },
+                {
+                    "Metric": "Cost per Token",
+                    "Value": f"£{custom_cost_per_token:.8f}",
+                    "Notes": "Price per token processed",
+                },
+                {
+                    "Metric": "Estimated Monthly Cost",
+                    "Value": f"£{detailed_estimated['Est Cost (GBP)']:.2f}",
+                    "Notes": "Total Tokens × Cost per Token",
+                },
+            ]
+        )
 
-    # Option to download the table as CSV
-    csv = df.to_csv(index=False).encode("utf-8")
-    st.download_button(
-        label="Download Cost Estimates as CSV",
-        data=csv,
-        file_name="cost_estimates.csv",
-        mime="text/csv",
-    )
+        # Display the table with custom formatting and auto-height
+        st.dataframe(
+            detailed_df,
+            column_config={
+                "Metric": "Metric",
+                "Value": st.column_config.Column(
+                    "Value",
+                    width="medium",
+                ),
+                "Notes": st.column_config.Column(
+                    "Notes",
+                    width="large",
+                ),
+            },
+            hide_index=True,
+            height=((len(detailed_df) + 1) * 35)
+            + 3,  # Calculate height based on number of rows plus header
+            use_container_width=True,  # Use full width of the container
+        )
 
 
 if __name__ == "__main__":
