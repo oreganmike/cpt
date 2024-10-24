@@ -8,10 +8,7 @@ st.markdown(
 )
 
 # === Token Metrics ===
-MODEL_COSTS = {
-    "gpt-4o": 0.0000036184,
-    "gpt-4o-alt": 0.000009329801
-}
+MODEL_COSTS = {"gpt-4o": 0.0000036184, "gpt-4o-alt": 0.000009329801}
 
 # === Scenarios ===
 SCENARIOS = {
@@ -73,29 +70,20 @@ def main():
     # Model Selection
     model_type = st.sidebar.selectbox(
         "Select OpenAI Model",
-        options=["gpt-4o","gpt-4o-alt"],
+        options=["gpt-4o", "gpt-4o-alt"],
         index=0,
         help="Sets the cost per token.",
     )
     default_cost_per_token = get_default_cost_per_token(model_type)
 
-    # # Custom Cost per Token Input
-    # tokens_per_turn = st.sidebar.number_input(
-    #     "Tokens per Turn",
-    #     min_value=200,
-    #     max_value=10000,
-    #     value=300,
-    #     help="User request tokens + model response tokens",
-    # )
-
     # Custom Cost per Token Input
     custom_cost_per_token = st.sidebar.number_input(
-        "Cost per chat Token (GBP)",
+        "Cost per Token (GBP)",
         min_value=0.000001,
         max_value=0.01,
         value=default_cost_per_token,
         format="%.8f",
-        help="The cost per chat completion token in GBP.",
+        help="Enter the cost per token in GBP.",
     )
 
     # Council Population Input
@@ -151,16 +139,28 @@ def main():
             min_value=1,
             value=4,
             step=1,
-            help="The number of turns per conversation (turn = 1 x user request and 1 x model response).",
+            help="The number of turns per conversation (turn = user request + model response).",
         )
         # Custom Cost per Token Input
-        tokens_per_turn = st.sidebar.number_input(
+        chat_tokens_per_turn = st.sidebar.number_input(
             "Tokens per Turn",
             min_value=200,
             max_value=10000,
             value=300,
+            step=100,
             help="User request tokens + model response tokens.",
         )
+        # Custom Cost per Token Input
+        rag_tokens = st.sidebar.number_input(
+            "RAG Tokens",
+            min_value=1000,
+            max_value=20000,
+            value=8000,
+            step=1000,
+            help="Completion tokens used during RAG process i.e. chunks submitted to model.",
+        )
+        tokens_per_turn = chat_tokens_per_turn + rag_tokens
+
         custom_params = {
             "engagement_rate": engagement_rate,
             "conversations_per_user": conversations_per_user,
@@ -193,17 +193,6 @@ def main():
     df = pd.DataFrame(data)
     st.subheader("Estimated Monthly Costs")
     st.table(df)
-
-    # # Bar Chart Visualization
-    # st.subheader("Cost Comparison Across Scenarios")
-    # cost_data = df[["Scenario", "Estimated Cost (GBP)"]].copy()
-    # # Convert 'Estimated Cost (GBP)' to numeric by stripping the currency symbol
-    # cost_data["Estimated Cost (GBP)"] = (
-    #     cost_data["Estimated Cost (GBP)"].replace("[£,]", "", regex=True).astype(float)
-    # )
-    # st.bar_chart(cost_data.set_index("Scenario"))
-
-    # [Previous code remains the same until the Detailed Calculations section]
 
     # Detailed Calculations for Selected Scenario
     if scenario != "Custom":
@@ -262,8 +251,13 @@ def main():
             },
             {
                 "Metric": "Tokens per Turn",
-                "Value": f"{tokens_per_turn:,}",
+                "Value": f"{chat_tokens_per_turn:,}",
                 "Notes": "Total tokens in one exchange (input + response)",
+            },
+            {
+                "Metric": "RAG Tokens",
+                "Value": f"{rag_tokens:,}",
+                "Notes": "RAG tokens consumed in each Turn",
             },
             {
                 "Metric": "Tokens per Conversation",
@@ -288,7 +282,6 @@ def main():
         ]
     )
 
-
     # Display the table with custom formatting and auto-height
     st.dataframe(
         detailed_df,
@@ -308,7 +301,6 @@ def main():
         + 3,  # Calculate height based on number of rows plus header
         use_container_width=True,  # Use full width of the container
     )
-
 
     # Option to download the table as CSV
     csv = df.to_csv(index=False).encode("utf-8")
