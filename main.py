@@ -7,6 +7,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+if "calculated_metrics" not in st.session_state:
+    st.session_state["calculated_metrics"] = {}
+
 # === Token Metrics ===
 MODEL_COSTS = {
     "gpt-4o": {
@@ -65,17 +68,20 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
     tokens_per_conversation = params["avg_conversation_length"] * tokens_per_turn
     total_tokens = total_conversations * tokens_per_conversation
     estimated_cost = total_tokens * cost_per_token
-    return {
+    
+    # Store results in Streamlit session state
+    st.session_state['calculated_metrics'] = {
         "Engaged Users": engaged_users,
         "Total Conversations": total_conversations,
         "Tokens per Conversation": tokens_per_conversation,
         "Total Tokens": total_tokens,
         "Estimated Cost (GBP)": estimated_cost,
     }
-
+    
+    return st.session_state['calculated_metrics']
 
 def main():
-    st.title("Azure OpenAI API Cost Estimator")
+    st.subheader("Azure OpenAI API Cost Estimator")
     st.markdown(
         """
     This application estimates the monthly cost of using Azure's OpenAI API based on various scenarios and user interactions.
@@ -199,9 +205,10 @@ def main():
         data.append(
             {
                 "Scenario": sc,
-                "Engagement Rate (%)": f"{params['engagement_rate'] * 100:.2f}",
-                "Conversations per User": params["conversations_per_user"],
-                "Avg Conversation Length (Turns)": params["avg_conversation_length"],
+                "Engagement Rate (%)": f"{params['engagement_rate'] * 100:.1f}%",
+                "Engaged Users": f"{st.session_state['calculated_metrics']['Engaged Users']:,.0f}",
+                "Conversations per User": f"{params['conversations_per_user']:.1f}",
+                "Qs per Conversation": params["avg_conversation_length"],
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.8f}",
                 "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:.2f}",  # Corrected key
             }
