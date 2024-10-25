@@ -157,7 +157,7 @@ def main():
             min_value=1,
             value=4,
             step=1,
-            help="The number of turns per conversation (turn = user request + model response).",
+            help="The number of turns or questions per conversation (turn = user question + model response).",
         )
         # Custom Cost per Token Input
         chat_tokens_per_turn = st.sidebar.number_input(
