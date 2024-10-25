@@ -210,7 +210,7 @@ def main():
                 "Conversations per User": f"{params['conversations_per_user']:.1f}",
                 "Qs per Conversation": params["avg_conversation_length"],
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.8f}",
-                "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:.2f}",  # Corrected key
+                "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:,.2f}", 
             }
         )
 
