@@ -153,11 +153,11 @@ def main():
             help="Conversations a user has per visit.",
         )
         avg_conversation_length = st.sidebar.number_input(
-            "Average Conversation Length (Turns)",
+            "Questions per Conversation (Turns)",
             min_value=1,
             value=4,
             step=1,
-            help="The number of turns or questions per conversation (turn = user question + model response).",
+            help="The number of questions a user asks in a conversation (turn = user question + model response).",
         )
         # Custom Cost per Token Input
         chat_tokens_per_turn = st.sidebar.number_input(
@@ -166,7 +166,7 @@ def main():
             max_value=10000,
             value=300,
             step=100,
-            help="User request tokens + model response tokens.",
+            help="User question tokens + model response tokens.",
         )
         # Custom Cost per Token Input
         rag_tokens = st.sidebar.number_input(
@@ -175,7 +175,7 @@ def main():
             max_value=20000,
             value=8000,
             step=1000,
-            help="Completion tokens used during RAG process i.e. chunks submitted to model.",
+            help="Input tokens used during RAG process i.e. user question + chunks submitted to model.",
         )
         tokens_per_turn = chat_tokens_per_turn + rag_tokens
 
