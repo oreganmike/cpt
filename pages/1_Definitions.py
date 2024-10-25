@@ -25,9 +25,13 @@ st.subheader("OpenAI Model Selection")
 st.markdown(
     """
 Model selection isn't that significant. For now it just allows for cost per token values to be pre-set. 
-- **GPT-4o**: Sets a cost per completion token of 0.00000362 (GBP)
-- **GPT-4o-alt**: Sets a cost per completion token of 0.0000093298 (GBP)
+**GPT-4o**: 
+- Sets a cost per input completion token of 0.000001866 (GBP)
+- Sets a cost per output completion token of 0.000007463801 (GBP)
 
+Note: 
+- A user's question + chunks of text returned from a similarity search = input tokens
+- The model's response to the user's question + chunks = output tokens
 """
 )
 
@@ -64,21 +68,35 @@ st.markdown(
 **Example**:
 - User question: "What are the council tax bands?" (7 tokens)
 - RAG process: Generates embeddings, performs search, submits question to model with chunks (~8,000 tokens)
-- Model response with detailed explanation (293 tokens)
-- Total = 8,300 tokens per turn
+- Model response with detailed explanation (220 tokens)
 
 """
 )
 
-st.subheader("Cost per Token")
+st.subheader("Cost per Input Token")
 st.markdown(
     """
-**Definition**: The price charged by Azure OpenAI for processing one token.
+**Definition**: The price charged by Azure OpenAI for processing one input token.
 
-- Measured in GBP
+- Uses GBP (£)
 - Pre-set cost per token assumes pay-as-you-go pricing
+- Cost per input token defaults to 0.000001866
+
 """
 )
+
+st.subheader("Cost per Output Token")
+st.markdown(
+    """
+**Definition**: The price charged by Azure OpenAI for generating one output token.
+
+- Uses GBP (£)
+- Pre-set cost per token assumes pay-as-you-go pricing
+- Cost per output token defaults to 0.000007463801
+
+"""
+)
+
 
 st.markdown("---")
 

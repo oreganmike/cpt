@@ -8,7 +8,12 @@ st.markdown(
 )
 
 # === Token Metrics ===
-MODEL_COSTS = {"gpt-4o": 0.00000362, "gpt-4o-alt": 0.000009329801}
+MODEL_COSTS =  {
+    "gpt-4o": {
+        "input_token": 0.000001866,
+        "output_token": 0.000007463801,
+    }
+}
 
 # === Scenarios ===
 SCENARIOS = {
@@ -34,14 +39,25 @@ SCENARIOS = {
     },
 }
 
-
 def get_default_cost_per_token(model_type):
-    return MODEL_COSTS.get(
-        model_type, 0.00000362
-    )  # Default to gpt-4 if not specified
-
+    """
+    Retrieve the default cost per token based on the selected model type.
+    Parameters: model_type (str): The type of OpenAI model selected.
+    Returns: float: The cost per token in GBP.
+    """
+    return MODEL_COSTS.get(model_type["input_token"], 0.000001866)  # Default to gpt-4o if not specified
 
 def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
+    """
+    Calculate the estimated cost and related metrics for the chatbot usage.
+    Parameters:
+        params (dict): Dictionary containing 'engagement_rate', 'conversations_per_user', and 'avg_conversation_length'.
+        cost_per_token (float): Cost per token in GBP.
+        total_visitors (int): Total number of unique visitors per month.
+        tokens_per_turn (int): Number of tokens per conversation turn.
+    Returns:
+        dict: A dictionary with calculated metrics and estimated cost.
+    """
     engaged_users = total_visitors * params["engagement_rate"]
     total_conversations = engaged_users * params["conversations_per_user"]
     tokens_per_conversation = params["avg_conversation_length"] * tokens_per_turn
@@ -52,7 +68,7 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
         "Total Conversations": total_conversations,
         "Tokens per Conversation": tokens_per_conversation,
         "Total Tokens": total_tokens,
-        "Est Cost (GBP)": estimated_cost,
+        "Estimated Cost (GBP)": estimated_cost,
     }
 
 
@@ -70,7 +86,7 @@ def main():
     # Model Selection
     model_type = st.sidebar.selectbox(
         "Select OpenAI Model",
-        options=["gpt-4o", "gpt-4o-alt"],
+        options=["gpt-4o"],
         index=0,
         help="Sets the cost per token.",
     )
@@ -78,7 +94,7 @@ def main():
 
     # Custom Cost per Token Input
     custom_cost_per_token = st.sidebar.number_input(
-        "Cost per Token (GBP)",
+        "Cost per Input Token (GBP)",
         min_value=0.000001,
         max_value=0.01,
         value=default_cost_per_token,
@@ -211,7 +227,7 @@ def main():
 
         st.subheader(f"Calculation for {scenario} Scenario")
 
-        # Create a DataFrame for the detailed calculations
+        # Create a DataFrame for custom scenario 
         detailed_df = pd.DataFrame(
             [
                 {
@@ -252,17 +268,17 @@ def main():
                 {
                     "Metric": "Conversation Length",
                     "Value": f"{selected_params['avg_conversation_length']} turns",
-                    "Notes": "Number of back-and-forth exchanges",
-                },
-                {
-                    "Metric": "Tokens per Turn",
-                    "Value": f"{chat_tokens_per_turn:,}",
-                    "Notes": "Total tokens in one exchange (input + response)",
+                    "Notes": "Number of back-and-forth exchanges (Turns)",
                 },
                 {
                     "Metric": "RAG Tokens",
                     "Value": f"{rag_tokens:,}",
-                    "Notes": "RAG tokens consumed in each Turn",
+                    "Notes": "Tokens consumed during RAG process for each turn",
+                },
+                {
+                    "Metric": "Tokens per Turn",
+                    "Value": f"{chat_tokens_per_turn:,}",
+                    "Notes": "Chat tokens in one exchange (user question + RAG process + model response)",
                 },
                 {
                     "Metric": "Tokens per Conversation",
@@ -275,7 +291,7 @@ def main():
                     "Notes": "Total Conversations × Tokens per Conversation",
                 },
                 {
-                    "Metric": "Cost per Token",
+                    "Metric": "Cost per Input Token",
                     "Value": f"£{custom_cost_per_token:.8f}",
                     "Notes": "Price per token processed",
                 },
