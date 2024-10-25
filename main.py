@@ -8,7 +8,7 @@ st.markdown(
 )
 
 # === Token Metrics ===
-MODEL_COSTS =  {
+MODEL_COSTS = {
     "gpt-4o": {
         "input_token": 0.000001866,
         "output_token": 0.000007463801,
@@ -39,13 +39,15 @@ SCENARIOS = {
     },
 }
 
+
 def get_default_cost_per_token(model_type):
     """
     Retrieve the default cost per token based on the selected model type.
     Parameters: model_type (str): The type of OpenAI model selected.
     Returns: float: The cost per token in GBP.
     """
-    return MODEL_COSTS.get(model_type["input_token"], 0.000001866)  # Default to gpt-4o if not specified
+    return MODEL_COSTS.get(model_type, {}).get("input_token", 0.000001866)  # Default to gpt-4o if not specified
+
 
 def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
     """
@@ -201,7 +203,7 @@ def main():
                 "Conversations per User": params["conversations_per_user"],
                 "Avg Conversation Length (Turns)": params["avg_conversation_length"],
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.8f}",
-                "Est Cost (GBP)": f"£{estimated['Est Cost (GBP)']:.2f}",
+                "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:.2f}",  # Corrected key
             }
         )
 
@@ -227,7 +229,7 @@ def main():
 
         st.subheader(f"Calculation for {scenario} Scenario")
 
-        # Create a DataFrame for custom scenario 
+        # Create a DataFrame for custom scenario
         detailed_df = pd.DataFrame(
             [
                 {
@@ -297,7 +299,7 @@ def main():
                 },
                 {
                     "Metric": "Estimated Monthly Cost",
-                    "Value": f"£{detailed_estimated['Est Cost (GBP)']:.2f}",
+                    "Value": f"£{detailed_estimated['Estimated Cost (GBP)']:.2f}",
                     "Notes": "Total Tokens × Cost per Token",
                 },
             ]
