@@ -23,22 +23,22 @@ SCENARIOS = {
     "Low": {
         "engagement_rate": 0.02,
         "conversations_per_user": 1.0,
-        "avg_conversation_length": 2,
+        "avg_questions_per_convo": 2,
     },
     "Medium": {
         "engagement_rate": 0.03,
         "conversations_per_user": 1.8,
-        "avg_conversation_length": 4,
+        "avg_questions_per_convo": 4,
     },
     "Heavy": {
         "engagement_rate": 0.05,
         "conversations_per_user": 2.6,
-        "avg_conversation_length": 8,
+        "avg_questions_per_convo": 8,
     },
     "Custom": {
         "engagement_rate": 0.05,  # Default values; will be overridden
         "conversations_per_user": 2.1,
-        "avg_conversation_length": 5,
+        "avg_questions_per_convo": 5,
     },
 }
 
@@ -49,14 +49,14 @@ def get_default_cost_per_token(model_type):
     Parameters: model_type (str): The type of OpenAI model selected.
     Returns: float: The cost per token in GBP.
     """
-    return MODEL_COSTS.get(model_type, {}).get("input_token", 0.000001866)  # Default to gpt-4o if not specified
+    return MODEL_COSTS.get(model_type, {}) #.get("input_token", 0.000001866) 
 
 
 def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
     """
     Calculate the estimated cost and related metrics for the chatbot usage.
     Parameters:
-        params (dict): Dictionary containing 'engagement_rate', 'conversations_per_user', and 'avg_conversation_length'.
+        params (dict): Dictionary containing 'engagement_rate', 'conversations_per_user', and 'avg_questions_per_convo'.
         cost_per_token (float): Cost per token in GBP.
         total_visitors (int): Total number of unique visitors per month.
         tokens_per_turn (int): Number of tokens per conversation turn.
@@ -65,7 +65,7 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
     """
     engaged_users = total_visitors * params["engagement_rate"]
     total_conversations = engaged_users * params["conversations_per_user"]
-    tokens_per_conversation = params["avg_conversation_length"] * tokens_per_turn
+    tokens_per_conversation = params["avg_questions_per_convo"] * tokens_per_turn
     total_tokens = total_conversations * tokens_per_conversation
     estimated_cost = total_tokens * cost_per_token
     
@@ -82,32 +82,38 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
 
 def main():
     st.subheader("Azure OpenAI API Cost Estimator")
-    st.markdown(
-        """
-    This application estimates the monthly cost of using Azure's OpenAI API based on various scenarios and user interactions.
-    """
-    )
+    st.markdown("Estimates the monthly cost of the Azure OpenAI Service.")
 
     # Sidebar for Inputs
-    st.sidebar.header("Input Parameters")
+    st.sidebar.header("Token Inputs")
 
     # Model Selection
     model_type = st.sidebar.selectbox(
         "Select OpenAI Model",
         options=["gpt-4o"],
         index=0,
-        help="Sets the cost per token.",
+        help="Sets the input and output cost per token.",
     )
-    default_cost_per_token = get_default_cost_per_token(model_type)
-
+    default_cost_per_input_token = get_default_cost_per_token(model_type).get("input_token", 0.000001866)
+    default_cost_per_output_token = get_default_cost_per_token(model_type).get("output_token", 0.000007463801)
+    
     # Custom Cost per Token Input
     custom_cost_per_token = st.sidebar.number_input(
-        "Cost per Input Token (GBP)",
+        "Cost per Input Token",
         min_value=0.000001,
         max_value=0.01,
-        value=default_cost_per_token,
+        value=default_cost_per_input_token,
         format="%.8f",
-        help="Enter the cost per token in GBP.",
+        help="The cost per input token in GBP.",
+    )
+    # Custom Cost per Token Input
+    custom_cost_per_output_token = st.sidebar.number_input(
+        "Cost per Output Token",
+        min_value=0.000001,
+        max_value=0.01,
+        value=default_cost_per_output_token,
+        format="%.8f",
+        help="The cost per output token in GBP.",
     )
 
     # Council Population Input
@@ -158,37 +164,47 @@ def main():
             step=0.1,
             help="Conversations a user has per visit.",
         )
-        avg_conversation_length = st.sidebar.number_input(
+        avg_questions_per_convo = st.sidebar.number_input(
             "Questions per Conversation (Turns)",
             min_value=1,
             value=4,
             step=1,
             help="The number of questions a user asks in a conversation (turn = user question + model response).",
         )
-        # Custom Cost per Token Input
-        chat_tokens_per_turn = st.sidebar.number_input(
-            "Tokens per Turn",
-            min_value=200,
+
+        # Input tokens
+        tokens_per_question = st.sidebar.number_input(
+            "Tokens per Question",
+            min_value=100,
             max_value=10000,
-            value=300,
-            step=100,
-            help="User question tokens + model response tokens.",
+            value=100,
+            step=50,
+            help="The number of tokens in an average question.",
         )
-        # Custom Cost per Token Input
+        # RAG tokens / Input tokens
         rag_tokens = st.sidebar.number_input(
             "RAG Tokens",
             min_value=1000,
             max_value=20000,
             value=8000,
             step=1000,
-            help="Input tokens used during RAG process i.e. user question + chunks submitted to model.",
+            help="Input tokens used during RAG process i.e. chunks submitted to model.",
         )
-        tokens_per_turn = chat_tokens_per_turn + rag_tokens
+        # Output tokens
+        tokens_per_answer = st.sidebar.number_input(
+            "Tokens per Answer",
+            min_value=200,
+            max_value=10000,
+            value=300,
+            step=50,
+            help="The number of tokens generated by the model in an average answer.",
+        )
+        tokens_per_turn = tokens_per_question + rag_tokens + tokens_per_answer
 
         custom_params = {
             "engagement_rate": engagement_rate,
             "conversations_per_user": conversations_per_user,
-            "avg_conversation_length": avg_conversation_length,
+            "avg_questions_per_convo": avg_questions_per_convo,
         }
     else:
         custom_params = SCENARIOS[scenario]
@@ -208,7 +224,7 @@ def main():
                 "Engagement Rate (%)": f"{params['engagement_rate'] * 100:.1f}%",
                 "Engaged Users": f"{st.session_state['calculated_metrics']['Engaged Users']:,.0f}",
                 "Conversations per User": f"{params['conversations_per_user']:.1f}",
-                "Qs per Conversation": params["avg_conversation_length"],
+                "Qs per Conversation": f"{params['avg_questions_per_convo']:.0f}",
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.8f}",
                 "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:,.2f}", 
             }
@@ -275,24 +291,19 @@ def main():
                     "Notes": "Engaged Users × Conversations per User",
                 },
                 {
-                    "Metric": "Conversation Length",
-                    "Value": f"{selected_params['avg_conversation_length']} turns",
-                    "Notes": "Number of back-and-forth exchanges (Turns)",
+                    "Metric": "Questions per Conversation",
+                    "Value": f"{selected_params['avg_questions_per_convo']}",
+                    "Notes": "Number of questions asked in a conversation (Turns)",
                 },
                 {
-                    "Metric": "RAG Tokens",
-                    "Value": f"{rag_tokens:,}",
-                    "Notes": "Tokens consumed during RAG process for each turn",
-                },
-                {
-                    "Metric": "Tokens per Turn",
-                    "Value": f"{chat_tokens_per_turn:,}",
-                    "Notes": "Chat tokens in one exchange (user question + RAG process + model response)",
+                    "Metric": "Tokens per Question",
+                    "Value": f"{tokens_per_turn:,}",
+                    "Notes": "Question tokens + RAG tokens + Answer tokens",
                 },
                 {
                     "Metric": "Tokens per Conversation",
                     "Value": f"{int(detailed_estimated['Tokens per Conversation']):,}",
-                    "Notes": "Conversation Length × Tokens per Turn",
+                    "Notes": "Questions per Conversation × Tokens per Question",
                 },
                 {
                     "Metric": "Total Monthly Tokens",
@@ -328,8 +339,8 @@ def main():
             },
             hide_index=True,
             height=((len(detailed_df) + 1) * 35)
-            + 3,  # Calculate height based on number of rows plus header
-            use_container_width=True,  # Use full width of the container
+            + 3, 
+            use_container_width=True,  
         )
 
 
