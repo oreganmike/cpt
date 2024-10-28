@@ -323,7 +323,7 @@ def main():
                 {
                     "Metric": "Tokens per Conversation",
                     "Value": f"{int(detailed_estimated['Tokens per Conversation']):,}",
-                    "Notes": f"Questions per Conversation ({selected_params['avg_questions_per_convo']}) × Tokens per Question ({tokens_per_turn:,})",
+                    "Notes": f"Questions per conversation × 2 − 1 ({selected_params['avg_questions_per_convo'] * 2 -1}) × Tokens per Question ({tokens_per_turn:,})",
                 },
                 {
                     "Metric": "Total Monthly Tokens",
