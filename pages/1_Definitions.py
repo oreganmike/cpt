@@ -36,13 +36,14 @@ Note:
 """
 )
 
-st.subheader("Tokens per Turn")
+st.subheader("Tokens per Question")
 st.markdown(
     """
 **Definition**: The total number of tokens used in one complete exchange between a user and the chatbot.
 
 This includes:
 - Tokens from the user's question/input
+- Tokens from the RAG process
 - Tokens from the model's response
 
 **Typical values**:
@@ -52,8 +53,9 @@ This includes:
 
 **Example**:
 - User question: "What are the council tax bands?" (7 tokens)
-- Model response with detailed explanation (293 tokens)
-- Total = 300 tokens per turn
+- RAG process: Generates embeddings, performs search, submits question to model with chunks (~2,000 tokens)
+- Model response with detailed explanation (393 tokens)
+- Total = 2,400 tokens per question
 
 """
 )
@@ -62,28 +64,24 @@ st.subheader("RAG Tokens")
 st.markdown(
     """
 **Definition**: The number of tokens consumed during the RAG process. 
-
 - Essentially all RAG tokens consist of text chunks that are submitted to the model for a contexually aided response
-- Embedding tokens are generated for the user's question. 
 
 **Example**:
 - User question: "What are the council tax bands?" (7 tokens)
-- RAG process: Generates embeddings, performs search, submits question to model with chunks (~8,000 tokens)
-- Model response with detailed explanation (220 tokens)
-- Total input tokens per turn = 8,007
-- Total output tokens per turn = 220
+- RAG process: Generates embeddings, performs search, submits question to model with chunks (2,000 tokens)
+- Model response with detailed explanation (393 tokens)
+- Total = 2,000 RAG tokens
 
 """
 )
-
 st.subheader("Cost per Input Token")
 st.markdown(
     """
-**Definition**: The price charged by Azure OpenAI for processing one input token.  
+**Definition**: The price charged by Azure OpenAI for processing one input token.
 
 - Uses GBP (£)
-- Pre-set cost per token assumes pay-as-you-go pricing  
-- Cost per input token defaults to 0.000001866  
+- Pre-set cost per token assumes pay-as-you-go pricing
+- Cost per input token defaults to gpt-4o-mini at 0.00000011196
 
 """
 )
@@ -93,9 +91,9 @@ st.markdown(
     """
 **Definition**: The price charged by Azure OpenAI for generating one output token.
 
-- Uses GBP (£)  
-- Pre-set cost per token assumes pay-as-you-go pricing  
-- Cost per output token defaults to 0.000007463801  
+- Uses GBP (£)
+- Pre-set cost per token assumes pay-as-you-go pricing
+- Cost per output token defaults to gpt-4o-mini at 0.0000004479
 
 """
 )
@@ -212,14 +210,14 @@ A conversation is a complete interaction session, which includes multiple questi
 st.subheader("Questions per Conversation (Turns)")
 st.markdown(
     """
-**Definition**: Average number of questions asked in a single conversation.
+**Definition**: Average number of questions asked in a single conversation.  
 
 One turn consists of:  
 1. User input/question  
 2. RAG process  
 3. Chatbot response  
 
-Scenario assumptions:
+Scenario assumptions:  
 - **Low**: 3 turns (brief, focused interactions)  
 - **Medium**: 4 turns (standard query resolution)  
 - **Heavy**: 8 turns (detailed, multi-step interactions)  
@@ -238,24 +236,24 @@ st.markdown("---")
 st.header("4. How Costs Are Calculated")
 st.markdown(
     """
-The final cost estimate follows this calculation process:
+The final cost estimate follows this calculation process:  
 
-1. **Calculate Engaged Users**:
+1. **Calculate Engaged Users**:  
     ```
     Council Population × Conversion Rate × Engagement Rate
     ```
 
-2. **Calculate Total Conversations**:
+2. **Calculate Total Conversations**:  
     ```
     Engaged Users × Conversations per User
     ```
 
-3. **Calculate Total Tokens**:
+3. **Calculate Total Tokens**:  
     ```
     Total Conversations × Questions per Conversation × Tokens per Question
     ```
 
-4. **Calculate Final Cost**:
+4. **Calculate Final Cost**:  
     ```
     Total Tokens × Cost per Token
     ```
