@@ -1,11 +1,15 @@
 import streamlit as st
 import pandas as pd
+import os
+from datetime import datetime
 
 st.set_page_config(page_title="Azure OpenAI Cost Estimator", layout="wide")
-st.markdown(
-    """<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} </style>""",
-    unsafe_allow_html=True,
-)
+
+# Get the last modified time of the main.py file
+file_path = __file__
+last_modified_time = os.path.getmtime(file_path)
+last_modified_datetime = datetime.fromtimestamp(last_modified_time).strftime("%d %B %Y at %I:%M%p").lower().replace(" 0", " ")
+
 
 if "calculated_metrics" not in st.session_state:
     st.session_state["calculated_metrics"] = {}
@@ -101,7 +105,7 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_question,
 
 def main():
     st.header("Azure OpenAI API Cost Estimator")
-    st.markdown("Estimates the monthly cost of the Azure OpenAI Service.")
+    st.markdown(f"Estimates the monthly cost of the Azure OpenAI Service. Last updated on: {last_modified_datetime}")
 
     # Sidebar for Inputs
     st.sidebar.header("Token Inputs")
