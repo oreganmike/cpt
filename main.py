@@ -237,7 +237,7 @@ def main():
 
     # Convert to DataFrame
     df = pd.DataFrame(data)
-    st.subheader("Estimated Monthly Costs")
+    st.subheader("Estimated Costs")
     st.table(df)
 
     with st.expander("Show Custom Scenario Details"):
