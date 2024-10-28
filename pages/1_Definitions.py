@@ -102,16 +102,13 @@ st.subheader("Tokens per Conversation")
 st.markdown(
     """
 **Definition**: The total number of tokens consumed in a conversation is calculated using the formula:  
-\[ Q_n + Q_{n-1} \]   
+ Qn + Qn-1  
+  
 Where:  
-- \( Q_n \) is the number of tokens for the current question (including question, RAG tokens, and response tokens).  
-- \( Q_{n-1} \) is the number of tokens for the previous question.  
+- Qn &nbsp; is the number of tokens for the current question (including question, RAG tokens, and response tokens).  
+- Qn-1 &nbsp; is the number of tokens for the current question minus one.
 
 **Explanation**:
-- For Question 1, the tokens per conversation are simply the tokens for that question.
-- For Question 2, the tokens per conversation are the sum of tokens for Question 2 and Question 1.
-- This pattern continues for subsequent questions.
-
 
 """
 )
