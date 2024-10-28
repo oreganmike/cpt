@@ -56,27 +56,20 @@ def get_default_cost_per_token(model_type):
     return MODEL_COSTS.get(model_type, {}) #.get("input_token", 0.000001866) 
 
 
-def calculate_costs(params, cost_per_token, total_visitors, tokens_per_question, rag_tokens, tokens_per_answer):
+def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
     """
     Calculate the estimated cost and related metrics for the chatbot usage.
     Parameters:
         params (dict): Dictionary containing 'engagement_rate', 'conversations_per_user', and 'avg_questions_per_convo'.
         cost_per_token (float): Cost per token in GBP.
         total_visitors (int): Total number of unique visitors per month.
-        tokens_per_question (int): Number of tokens per question.
-        rag_tokens (int): Number of RAG tokens per question.
-        tokens_per_answer (int): Number of tokens per answer.
+        tokens_per_turn (int): Number of tokens per conversation turn.
     Returns:
         dict: A dictionary with calculated metrics and estimated cost.
     """
     engaged_users = total_visitors * params["engagement_rate"]
     total_conversations = engaged_users * params["conversations_per_user"]
-    
-    # Calculate cumulative tokens per conversation
-    tokens_per_conversation = 0
-    for i in range(1, params["avg_questions_per_convo"] + 1):
-        tokens_per_conversation += i * (tokens_per_question + rag_tokens + tokens_per_answer)
-    
+    tokens_per_conversation = params["avg_questions_per_convo"] * tokens_per_turn
     total_tokens = total_conversations * tokens_per_conversation
     estimated_cost = total_tokens * cost_per_token
     
@@ -92,8 +85,8 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_question,
     return st.session_state['calculated_metrics']
 
 def main():
-    st.header("Azure OpenAI API Cost Estimator")
-    st.markdown("Estimates the monthly cost of the Azure OpenAI Service.")
+    st.subheader("Azure OpenAI API Cost Estimator")
+    st.markdown("Estimates costs for the Azure OpenAI Service.")
 
     # Sidebar for Inputs
     st.sidebar.header("Token Inputs")
@@ -227,7 +220,7 @@ def main():
         if sc == "Custom" and scenario == "Custom":
             params = custom_params
         estimated = calculate_costs(
-            params, custom_cost_per_token, monthly_unique_visitors, tokens_per_question, rag_tokens, tokens_per_answer
+            params, custom_cost_per_token, monthly_unique_visitors, tokens_per_turn
         )
         data.append(
             {
@@ -244,7 +237,7 @@ def main():
 
     # Convert to DataFrame
     df = pd.DataFrame(data)
-    st.subheader("Estimated Monthly Costs")
+    st.subheader("Estimated Costs")
     st.table(df)
 
     with st.expander("Show Custom Scenario Details"):
@@ -259,7 +252,7 @@ def main():
             selected_params,
             custom_cost_per_token,
             monthly_unique_visitors,
-            tokens_per_question, rag_tokens, tokens_per_answer
+            tokens_per_turn,
         )
 
         st.subheader(f"Calculation for {scenario} Scenario")
