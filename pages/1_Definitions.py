@@ -1,8 +1,15 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Cost Estimator Definitions", page_icon="📚", layout="wide")
-st.markdown("""<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} </style>""",unsafe_allow_html=True,)
+st.set_page_config(
+    page_title="Cost Estimator Definitions", page_icon="📚", layout="wide"
+)
+
+st.markdown(
+    """<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} </style>""",
+    unsafe_allow_html=True,
+)
+
 
 st.header("Cost Estimator Parameters")
 
@@ -18,119 +25,46 @@ st.header("1. Model Parameters")
 st.subheader("OpenAI Model Selection")
 st.markdown(
     """
-Model selection isn't that significant. For now it just allows for cost per token values to be pre-set. 
-**GPT-4o**: 
-- Sets a cost per input completion token of 0.000001866 (GBP)
-- Sets a cost per output completion token of 0.000007463801 (GBP)
-
-Note: 
-- A user's question + chunks of text returned from a similarity search = input tokens
-- The model's response to the user's question + chunks = output tokens
-"""
-)
-
-st.subheader("Tokens per Question")
-st.markdown(
-    """
-**Definition**: The total number of tokens used in one complete exchange between a user and the chatbot.
-
-This includes:
-- Tokens from the user's question/input
-- Tokens from the RAG process
-- Tokens from the model's response
-
-**Typical values**:
-- Short exchanges: 200-400 tokens
-- Medium exchanges: 400-800 tokens
-- Long, detailed exchanges: 800+ tokens
-
-**Example**:
-- User question: "What are the council tax bands?" (7 tokens)
-- RAG process: Generates embeddings, performs search, submits question to model with chunks (~2,000 tokens)
-- Model response with detailed explanation (393 tokens)
-- Total = 2,400 tokens per question
+Model selection sets the cost per input token and cost per output token according to Azure's OpenAI pricing page. 
 
 """
 )
 
-st.subheader("RAG Tokens")
+# Convert cost per token information into a table
+st.subheader("Cost per Input and Output Tokens")
 st.markdown(
     """
-**Definition**: The number of tokens consumed during the RAG process. 
-- Essentially all RAG tokens consist of text chunks that are submitted to the model for a contexually aided response
-
-**Example**:
-- User question: "What are the council tax bands?" (7 tokens)
-- RAG process: Generates embeddings, performs search, submits question to model with chunks (2,000 tokens)
-- Model response with detailed explanation (393 tokens)
-- Total = 2,000 RAG tokens
-
-"""
-)
-st.subheader("Cost per Input Token")
-st.markdown(
-    """
-**Definition**: The price charged by Azure OpenAI for processing one input token.
+**Definition**: The price charged by Azure OpenAI for processing one input token or generating one output token.
 
 - Uses GBP (£)
-- Pre-set cost per token assumes pay-as-you-go pricing
-- Cost per input token defaults to gpt-4o-mini at 0.00000011196
-
+- Uses Global Deployment pricing
+- Units are in tokens rather than per hour
 """
 )
 
-st.subheader("Cost per Output Token")
-st.markdown(
-    """
-**Definition**: The price charged by Azure OpenAI for generating one output token.
+# Create a DataFrame for the cost per token with formatted values
+model_costs_data = {
+    "Model": ["gpt-4o", "gpt-4o-mini"],
+    "Cost per Input Token": ["{:.10f}".format(0.000001866), "{:.10f}".format(0.00000011196)],
+    "Cost per Output Token": ["{:.10f}".format(0.000007463801), "{:.10f}".format(0.0000004479)],
+    "Cost per 1M Input Tokens": ["{:.2f}".format(1.8660), "{:.2f}".format(0.11196)],
+    "Cost per 1M Output Tokens": ["{:.2f}".format(11.1958), "{:.2f}".format(0.4479)],
+}
 
-- Uses GBP (£)
-- Pre-set cost per token assumes pay-as-you-go pricing
-- Cost per output token defaults to gpt-4o-mini at 0.0000004479
-
-"""
-)
-
-st.subheader("Tokens per Conversation")
-st.markdown(
-    """
-**Definition**: The total number of tokens consumed in a conversation is calculated using the formula:  
- Qn + Qn-1  
-  
-Where:  
-- Qn &nbsp; is the number of tokens for the current question (including question, RAG tokens, and response tokens).  
-- Qn-1 &nbsp; is the number of tokens for the current question minus one.
-
-**Explanation**:
-
-"""
-)
-
-# Example data for a conversation with 3 questions
-example_data = [
-    {"Question": 1, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 2400, "Notes":"1 + 0"},
-    {"Question": 2, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"2 + 1"},
-    {"Question": 3, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"3 + 2"},
-    {"Question": 4, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"4 + 3"},
-]
-
-# Convert to DataFrame for display
-example_df = pd.DataFrame(example_data)
+model_costs_df = pd.DataFrame(model_costs_data)
 
 # Display the table
-st.table(example_df)
+st.table(model_costs_df)
 
-st.markdown(
-    """
-**Total Tokens for the Conversation**:  
-- Example: 2,400 + 4,800 + 4,800 + 4,800 = 16,800 tokens
-"""
-)
+
+
 
 st.markdown("---")
 
+
+
 # Population Metrics
-st.header("2. Council Population Metrics")
+st.header("2. Council Metrics")
 
 st.subheader("Council Population")
 st.markdown(
@@ -163,10 +97,15 @@ It's also a metric councils can easily provide from their Google Analytics data.
 )
 
 
+
+
 st.markdown("---")
 
+
+
+
 # Chatbot Engagement Metrics
-st.header("3. Chatbot Engagement Metrics")
+st.header("3. Chatbot Metrics")
 
 st.subheader("Engagement Rate")
 st.markdown(
@@ -207,7 +146,7 @@ One turn consists of:
 3. Chatbot response  
 
 Scenario assumptions:  
-- **Low**: 3 turns (brief, focused interactions)  
+- **Low**: 2 turns (brief, focused interactions)  
 - **Medium**: 4 turns (standard query resolution)  
 - **Heavy**: 8 turns (detailed, multi-step interactions)  
 
@@ -219,7 +158,125 @@ Scenario assumptions:
 )
 
 
+st.subheader("User input tokens")
+st.markdown(
+    """
+**Definition**: The number of tokens used in a user's input.
+"""
+)
+
+# Create a DataFrame for typical token values
+tokens_per_question_data = {
+    "Exchange Type": ["Very Short", "Short", "Medium", "Long"],
+    "Token Range": ["5-50", "50-100", "100-200", "200+"],
+}
+
+tokens_per_question_df = pd.DataFrame(tokens_per_question_data)
+
+# Display the table
+st.table(tokens_per_question_df)
+
+st.markdown(
+    """
+**Example**:
+- **User question: "What are the council tax bands?" (7 tokens)**
+- RAG process: Generates embeddings, performs search, submits question to model with chunks (~2,000 tokens)
+- Model response with detailed explanation (393 tokens)
+- Total = 7 user input tokens
+
+"""
+)
+
+st.subheader("RAG Tokens")
+st.markdown(
+    """
+**Definition**: The number of tokens consumed during the RAG process.  
+- Essentially all RAG tokens consist of text chunks that are submitted to the model for a contextually aided response
+"""
+)
+
+# Create a DataFrame for RAG token example
+rag_tokens_example_data = {
+    "Component": ["User Question", "RAG Process", "Model Response"],
+    "Tokens": [7, 2000, 393],
+}
+
+rag_tokens_example_df = pd.DataFrame(rag_tokens_example_data)
+
+# Display the table
+st.table(rag_tokens_example_df)
+
+st.markdown(
+    """
+**Example**:
+- User question: "What are the council tax bands?" (7 tokens)
+- **RAG process: Generates embeddings, performs search, submits question to model with chunks (2,000 tokens)**
+- Model response with detailed explanation (393 tokens)
+- Total = 2,000 user input tokens
+
+"""
+)
+
+
+st.subheader("Model output tokens")
+st.markdown(
+    """
+**Definition**: The number of tokens the model generates for its response.
+"""
+)
+
+st.markdown(
+    """
+**Example**:
+- User question: "What are the council tax bands?" (7 tokens)  
+- RAG process: Generates embeddings, performs search, submits question to model with chunks (~2,000 tokens)  
+- **Model response with detailed explanation (393 tokens)**
+- Total = 393 model output tokens
+
+"""
+)
+
+
+st.subheader("Tokens per Conversation")
+st.markdown(
+    """
+**Definition**: The total number of tokens consumed in a conversation is calculated using the formula:  
+ Qn + Qn-1  
+  
+Where:  
+- Qn &nbsp; is the number of tokens for the current question (including User input tokens, RAG tokens, and model output tokens).  
+- Qn-1 &nbsp; is the number of tokens for the current question minus one.
+"""
+)
+
+# Example data for a conversation with 3 questions
+example_data = [
+    {"Question": 1, "User input tokens": 100, "RAG Tokens": 2000, "Model output tokens": 300, "Input Tokens": 2400, "Notes":"1 + 0"},
+    {"Question": 2, "User input tokens": 100, "RAG Tokens": 2000, "Model output tokens": 300, "Input Tokens": 4800, "Notes":"2 + 1"},
+    {"Question": 3, "User input tokens": 100, "RAG Tokens": 2000, "Model output tokens": 300, "Input Tokens": 4800, "Notes":"3 + 2"},
+    {"Question": 4, "User input tokens": 100, "RAG Tokens": 2000, "Model output tokens": 300, "Input Tokens": 4800, "Notes":"4 + 3"},
+]
+
+# Convert to DataFrame for display
+example_df = pd.DataFrame(example_data)
+
+# Display the table
+st.table(example_df)
+
+st.markdown(
+    """
+**Total Tokens for the Conversation**:  
+- Example: 2,400 + 4,800 + 4,800 + 4,800 = 16,800 tokens
+"""
+)
+
+
+
+
 st.markdown("---")
+
+
+
 
 # Cost Calculation Process
 st.header("4. How Costs Are Calculated")
