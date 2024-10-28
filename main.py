@@ -190,7 +190,7 @@ def main():
             "RAG Tokens",
             min_value=1000,
             max_value=20000,
-            value=8000,
+            value=2000,
             step=1000,
             help="Input tokens used during RAG process i.e. chunks submitted to model.",
         )
