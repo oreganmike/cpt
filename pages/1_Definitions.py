@@ -1,15 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(
-    page_title="Cost Estimator Definitions", page_icon="📚", layout="wide"
-)
-
-st.markdown(
-    """<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} </style>""",
-    unsafe_allow_html=True,
-)
-
+st.set_page_config(page_title="Cost Estimator Definitions", page_icon="📚", layout="wide")
+st.markdown("""<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;} </style>""",unsafe_allow_html=True,)
 
 st.header("Cost Estimator Parameters")
 
