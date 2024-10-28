@@ -86,7 +86,7 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
 
 def main():
     st.subheader("Azure OpenAI API Cost Estimator")
-    st.markdown("Estimates the monthly cost of the Azure OpenAI Service.")
+    st.markdown("Estimates costs for the Azure OpenAI Service.")
 
     # Sidebar for Inputs
     st.sidebar.header("Token Inputs")
