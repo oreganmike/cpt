@@ -231,7 +231,7 @@ def main():
                 "Qs per Conversation": f"{params['avg_questions_per_convo']:.0f}",
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.10f}",
                 "Est MonthlyCost (GBP)": f"£{estimated['Estimated Cost (GBP)']:,.2f}", 
-                "Est Annual Cost (GBP)": f"£{estimated['Estimated Cost (GBP)'] * 12:.2f}",
+                "Est Annual Cost (GBP)": f"£{estimated['Estimated Cost (GBP)'] * 12:,.2f}",
             }
         )
 
