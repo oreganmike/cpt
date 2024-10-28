@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.set_page_config(
     page_title="Cost Estimator Definitions", page_icon="📚", layout="wide"
@@ -10,7 +11,7 @@ st.markdown(
 )
 
 
-st.title("Cost Estimator Parameters")
+st.header("Cost Estimator Parameters")
 
 st.markdown(
     """
@@ -69,6 +70,8 @@ st.markdown(
 - User question: "What are the council tax bands?" (7 tokens)
 - RAG process: Generates embeddings, performs search, submits question to model with chunks (~8,000 tokens)
 - Model response with detailed explanation (220 tokens)
+- Total input tokens per turn = 8,007
+- Total output tokens per turn = 220
 
 """
 )
@@ -97,6 +100,42 @@ st.markdown(
 """
 )
 
+st.subheader("Cumulative Tokens per Conversation")
+st.markdown(
+    """
+**Definition**: The total number of tokens consumed in a conversation, accounting for the cumulative nature of token usage.
+
+In a chatbot interaction, each subsequent question includes all previous questions and answers. This means that the token count for each turn in a conversation is cumulative.
+
+**Calculation**:
+- For each question in a conversation, the tokens include:
+  - Tokens from the current question
+  - RAG tokens for contextual processing
+  - Tokens from the model's response
+
+**Example Calculation**:
+"""
+)
+
+# Example data for a conversation with 3 questions
+example_data = [
+    {"Turn": 1, "Tokens per Question": 100, "RAG Tokens": 8000, "Tokens per Answer": 300, "Cumulative Tokens": 8400},
+    {"Turn": 2, "Tokens per Question": 100, "RAG Tokens": 8000, "Tokens per Answer": 300, "Cumulative Tokens": 16800},
+    {"Turn": 3, "Tokens per Question": 100, "RAG Tokens": 8000, "Tokens per Answer": 300, "Cumulative Tokens": 25200},
+]
+
+# Convert to DataFrame for display
+example_df = pd.DataFrame(example_data)
+
+# Display the table
+st.table(example_df)
+
+st.markdown(
+    """
+- **Total Tokens for the Conversation**: Sum of cumulative tokens for all turns.
+  - Example: 8400 + 16800 + 25200 = 50400 tokens
+"""
+)
 
 st.markdown("---")
 
@@ -127,7 +166,7 @@ st.markdown(
 - Monthly Active Users: 126,253
 - Conversion Rate: 57.4%
 
-This metric helps estimate how many citizens could engage in conversations. 
+This metric helps estimate how many citizens actively interact with the council's website. 
 It's also a metric councils can easily provide from their Google Analytics data.
 
 """
