@@ -15,6 +15,10 @@ MODEL_COSTS = {
     "gpt-4o": {
         "input_token": 0.000001866,
         "output_token": 0.000007463801,
+    },
+    "gpt-4o-mini": {
+        "input_token": 0.00000011196,
+        "output_token": 0.0000004479
     }
 }
 
@@ -90,8 +94,8 @@ def main():
     # Model Selection
     model_type = st.sidebar.selectbox(
         "Select OpenAI Model",
-        options=["gpt-4o"],
-        index=0,
+        options=["gpt-4o", "gpt-4o-mini"],
+        index=1,
         help="Sets the input and output cost per token.",
     )
     default_cost_per_input_token = get_default_cost_per_token(model_type).get("input_token", 0.000001866)
@@ -100,19 +104,19 @@ def main():
     # Custom Cost per Token Input
     custom_cost_per_token = st.sidebar.number_input(
         "Cost per Input Token",
-        min_value=0.000001,
+        min_value=0.000000001,
         max_value=0.01,
         value=default_cost_per_input_token,
-        format="%.8f",
+        format="%.10f",
         help="The cost per input token in GBP.",
     )
     # Custom Cost per Token Input
     custom_cost_per_output_token = st.sidebar.number_input(
         "Cost per Output Token",
-        min_value=0.000001,
+        min_value=0.000000001,
         max_value=0.01,
         value=default_cost_per_output_token,
-        format="%.8f",
+        format="%.10f",
         help="The cost per output token in GBP.",
     )
 
@@ -225,8 +229,9 @@ def main():
                 "Engaged Users": f"{st.session_state['calculated_metrics']['Engaged Users']:,.0f}",
                 "Conversations per User": f"{params['conversations_per_user']:.1f}",
                 "Qs per Conversation": f"{params['avg_questions_per_convo']:.0f}",
-                "Cost per Token (GBP)": f"£{custom_cost_per_token:.8f}",
-                "Estimated Cost (GBP)": f"£{estimated['Estimated Cost (GBP)']:,.2f}", 
+                "Cost per Token (GBP)": f"£{custom_cost_per_token:.10f}",
+                "Est MonthlyCost (GBP)": f"£{estimated['Estimated Cost (GBP)']:,.2f}", 
+                "Est Annual Cost (GBP)": f"£{estimated['Estimated Cost (GBP)'] * 12:.2f}",
             }
         )
 
@@ -312,13 +317,18 @@ def main():
                 },
                 {
                     "Metric": "Cost per Input Token",
-                    "Value": f"£{custom_cost_per_token:.8f}",
+                    "Value": f"£{custom_cost_per_token:.10f}",
                     "Notes": "Price per token processed",
                 },
                 {
-                    "Metric": "Estimated Monthly Cost",
+                    "Metric": "Est Monthly Cost",
                     "Value": f"£{detailed_estimated['Estimated Cost (GBP)']:.2f}",
                     "Notes": "Total Tokens × Cost per Token",
+                },
+                {
+                    "Metric": "Est Annual Cost",
+                    "Value": f"£{detailed_estimated['Estimated Cost (GBP)'] * 12:.2f}",
+                    "Notes": "Estimated Monthly Cost × 12",
                 },
             ]
         )
@@ -339,8 +349,8 @@ def main():
             },
             hide_index=True,
             height=((len(detailed_df) + 1) * 35)
-            + 3, 
-            use_container_width=True,  
+            + 3,  # Calculate height based on number of rows plus header
+            use_container_width=True,  # Use full width of the container
         )
 
 
