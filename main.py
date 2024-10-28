@@ -302,7 +302,7 @@ def main():
                 },
                 {
                     "Metric": "Conversations per User",
-                    "Value": f"{selected_params['conversations_per_user']}",
+                    "Value": f"{selected_params['conversations_per_user']:.1f}",
                     "Notes": "Average conversations per engaged user",
                 },
                 {
