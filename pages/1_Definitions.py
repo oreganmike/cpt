@@ -101,28 +101,27 @@ st.markdown(
 st.subheader("Tokens per Conversation")
 st.markdown(
     """
-**Definition**: The total number of tokens consumed in a conversation will be the sum of the tokens for each question plus the previous question's tokens.  
+**Definition**: The total number of tokens consumed in a conversation is calculated using the formula:  
+\[ Q_n + Q_{n-1} \]   
+Where:  
+- \( Q_n \) is the number of tokens for the current question (including question, RAG tokens, and response tokens).  
+- \( Q_{n-1} \) is the number of tokens for the previous question.  
 
-In a chatbot interaction, each subsequent question includes the previous question and answer for context.   
-This means that the token count for each question in a conversation is current + previous.  
-Expressed as a simple formula it could look like: Qn + Qn-1  
+**Explanation**:
+- For Question 1, the tokens per conversation are simply the tokens for that question.
+- For Question 2, the tokens per conversation are the sum of tokens for Question 2 and Question 1.
+- This pattern continues for subsequent questions.
 
-**Calculation**:
-- For each question in a conversation, the tokens include:  
-  - Tokens from the current question  
-  - RAG tokens for contextual processing  
-  - Tokens from the model's response  
 
-**Example Calculation**:
 """
 )
 
 # Example data for a conversation with 3 questions
 example_data = [
-    {"Turn": 1, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 2400, "Notes":"1 + 0"},
-    {"Turn": 2, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"2 + 1"},
-    {"Turn": 3, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"3 + 2"},
-    {"Turn": 4, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"4 + 3"},
+    {"Question": 1, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 2400, "Notes":"1 + 0"},
+    {"Question": 2, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"2 + 1"},
+    {"Question": 3, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"3 + 2"},
+    {"Question": 4, "Tokens per Question": 100, "RAG Tokens": 2000, "Tokens per Answer": 300, "Input Tokens": 4800, "Notes":"4 + 3"},
 ]
 
 # Convert to DataFrame for display
@@ -133,8 +132,8 @@ st.table(example_df)
 
 st.markdown(
     """
-- **Total Tokens for the Conversation**: 
-  - Example: 2400 + 4800 + 4800 + 4800= 14,400 tokens
+**Total Tokens for the Conversation**:  
+- Example: 2,400 + 4,800 + 4,800 + 4,800 = 16,800 tokens
 """
 )
 

@@ -56,20 +56,35 @@ def get_default_cost_per_token(model_type):
     return MODEL_COSTS.get(model_type, {}) #.get("input_token", 0.000001866) 
 
 
-def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
+def calculate_costs(params, cost_per_token, total_visitors, tokens_per_question, rag_tokens, tokens_per_answer):
     """
     Calculate the estimated cost and related metrics for the chatbot usage.
     Parameters:
         params (dict): Dictionary containing 'engagement_rate', 'conversations_per_user', and 'avg_questions_per_convo'.
         cost_per_token (float): Cost per token in GBP.
         total_visitors (int): Total number of unique visitors per month.
-        tokens_per_turn (int): Number of tokens per conversation turn.
+        tokens_per_question (int): Number of tokens per question.
+        rag_tokens (int): Number of RAG tokens per question.
+        tokens_per_answer (int): Number of tokens per answer.
     Returns:
         dict: A dictionary with calculated metrics and estimated cost.
     """
     engaged_users = total_visitors * params["engagement_rate"]
     total_conversations = engaged_users * params["conversations_per_user"]
-    tokens_per_conversation = params["avg_questions_per_convo"] * tokens_per_turn
+    
+    # Calculate tokens per conversation using the new formula
+    tokens_per_conversation = 0
+    previous_tokens = 0
+    tokens_per_turn = tokens_per_question + rag_tokens + tokens_per_answer
+
+    for i in range(1, params["avg_questions_per_convo"] + 1):
+        current_tokens = tokens_per_turn
+        if i > 1:
+            tokens_per_conversation += current_tokens + previous_tokens
+        else:
+            tokens_per_conversation += current_tokens
+        previous_tokens = current_tokens
+
     total_tokens = total_conversations * tokens_per_conversation
     estimated_cost = total_tokens * cost_per_token
     
@@ -86,7 +101,7 @@ def calculate_costs(params, cost_per_token, total_visitors, tokens_per_turn):
 
 def main():
     st.header("Azure OpenAI API Cost Estimator")
-    st.markdown("Estimates costs for the Azure OpenAI Service.")
+    st.markdown("Estimates the monthly cost of the Azure OpenAI Service.")
 
     # Sidebar for Inputs
     st.sidebar.header("Token Inputs")
@@ -220,7 +235,7 @@ def main():
         if sc == "Custom" and scenario == "Custom":
             params = custom_params
         estimated = calculate_costs(
-            params, custom_cost_per_token, monthly_unique_visitors, tokens_per_turn
+            params, custom_cost_per_token, monthly_unique_visitors, tokens_per_question, rag_tokens, tokens_per_answer
         )
         data.append(
             {
@@ -231,13 +246,13 @@ def main():
                 "Qs per Conversation": f"{params['avg_questions_per_convo']:.0f}",
                 "Cost per Token (GBP)": f"£{custom_cost_per_token:.10f}",
                 "Est MonthlyCost (GBP)": f"£{estimated['Estimated Cost (GBP)']:,.2f}", 
-                "Est Annual Cost (GBP)": f"£{estimated['Estimated Cost (GBP)'] * 12:,.2f}",
+                "Est Annual Cost (GBP)": f"£{estimated['Estimated Cost (GBP)'] * 12:.2f}",
             }
         )
 
     # Convert to DataFrame
     df = pd.DataFrame(data)
-    st.subheader("Estimated Costs")
+    st.subheader("Estimated Monthly Costs")
     st.table(df)
 
     with st.expander("Show Custom Scenario Details"):
@@ -252,7 +267,7 @@ def main():
             selected_params,
             custom_cost_per_token,
             monthly_unique_visitors,
-            tokens_per_turn,
+            tokens_per_question, rag_tokens, tokens_per_answer
         )
 
         st.subheader(f"Calculation for {scenario} Scenario")
@@ -273,7 +288,7 @@ def main():
                 {
                     "Metric": "Monthly Unique Visitors",
                     "Value": f"{int(monthly_unique_visitors):,}",
-                    "Notes": "Population × Conversion Rate",
+                    "Notes": f"Population ({int(council_population):,}) × Conversion Rate ({conversion_rate * 100:.2f}%)",
                 },
                 {
                     "Metric": "Engagement Rate",
@@ -283,7 +298,7 @@ def main():
                 {
                     "Metric": "Engaged Users",
                     "Value": f"{int(detailed_estimated['Engaged Users']):,}",
-                    "Notes": "Monthly Visitors × Engagement Rate",
+                    "Notes": f"Monthly Visitors ({int(monthly_unique_visitors):,}) × Engagement Rate ({selected_params['engagement_rate'] * 100:.2f}%)",
                 },
                 {
                     "Metric": "Conversations per User",
@@ -293,7 +308,7 @@ def main():
                 {
                     "Metric": "Total Conversations",
                     "Value": f"{int(detailed_estimated['Total Conversations']):,}",
-                    "Notes": "Engaged Users × Conversations per User",
+                    "Notes": f"Engaged Users ({int(detailed_estimated['Engaged Users']):,}) × Conversations per User ({selected_params['conversations_per_user']})",
                 },
                 {
                     "Metric": "Questions per Conversation",
@@ -303,17 +318,17 @@ def main():
                 {
                     "Metric": "Tokens per Question",
                     "Value": f"{tokens_per_turn:,}",
-                    "Notes": "Question tokens + RAG tokens + Answer tokens",
+                    "Notes": f"Question tokens ({tokens_per_question}) + RAG tokens ({rag_tokens:,}) + Answer tokens ({tokens_per_answer})",
                 },
                 {
                     "Metric": "Tokens per Conversation",
                     "Value": f"{int(detailed_estimated['Tokens per Conversation']):,}",
-                    "Notes": "Questions per Conversation × Tokens per Question",
+                    "Notes": f"Questions per Conversation ({selected_params['avg_questions_per_convo']}) × Tokens per Question ({tokens_per_turn:,})",
                 },
                 {
                     "Metric": "Total Monthly Tokens",
                     "Value": f"{int(detailed_estimated['Total Tokens']):,}",
-                    "Notes": "Total Conversations × Tokens per Conversation",
+                    "Notes": f"Total Conversations ({int(detailed_estimated['Total Conversations']):,}) × Tokens per Conversation ({int(detailed_estimated['Tokens per Conversation']):,})",
                 },
                 {
                     "Metric": "Cost per Input Token",
@@ -323,7 +338,7 @@ def main():
                 {
                     "Metric": "Est Monthly Cost",
                     "Value": f"£{detailed_estimated['Estimated Cost (GBP)']:.2f}",
-                    "Notes": "Total Tokens × Cost per Token",
+                    "Notes": f"Total Tokens ({int(detailed_estimated['Total Tokens']):,}) × Cost per Token (£{custom_cost_per_token:.10f})",
                 },
                 {
                     "Metric": "Est Annual Cost",
