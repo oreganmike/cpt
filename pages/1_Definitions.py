@@ -213,7 +213,7 @@ with st.expander("Chatbot Metrics"):
     - User question: "What are the council tax bands?" (7 tokens)
     - **RAG process: Generates embeddings, performs search, submits question to model with chunks (2,000 tokens)**
     - Model response with detailed explanation (393 tokens)
-    - Total = 2,000 user input tokens
+    - Total = 2,000 RAG tokens
 
     """
     )
@@ -230,7 +230,7 @@ with st.expander("Chatbot Metrics"):
         """
     **Example**:
     - User question: "What are the council tax bands?" (7 tokens)  
-    - RAG process: Generates embeddings, performs search, submits question to model with chunks (~2,000 tokens)  
+    - RAG process: Generates embeddings, performs search, submits question to model with chunks (2,000 tokens)  
     - **Model response with detailed explanation (393 tokens)**
     - Total = 393 model output tokens
 
