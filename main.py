@@ -13,7 +13,8 @@ st.markdown("""<style>#MainMenu {visibility: hidden;} footer {visibility: hidden
 def get_last_modified_time():
     file_path = __file__
     last_modified_timestamp = os.path.getmtime(file_path)
-    return datetime.fromtimestamp(last_modified_timestamp).strftime("%d %B %Y at %I:%M%p").lower().replace(" 0", " ")
+    #return datetime.fromtimestamp(last_modified_timestamp).strftime("%d %B %Y at %I:%M%p").lower().replace(" 0", " ")
+    return datetime.fromtimestamp(last_modified_timestamp).strftime("%d %B %Y").lower()
 
 last_modified_datetime = get_last_modified_time()
 
@@ -135,6 +136,7 @@ def get_sidebar_inputs():
         min_value=0.000000001,
         max_value=0.01,
         value=default_cost_per_input_token,
+        step=0.000000001,
         format="%.10f",
         help="The cost per input token in GBP.",
     )
@@ -144,6 +146,7 @@ def get_sidebar_inputs():
         min_value=0.000000001,
         max_value=0.01,
         value=default_cost_per_output_token,
+        step=0.000000001,
         format="%.10f",
         help="The cost per output token in GBP.",
     )
